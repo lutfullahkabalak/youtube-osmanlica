@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="tr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Osmanlıca altyazı</title>
+<link rel="stylesheet" href="popup.css">
+<body>
+<h1>Osmanlıca altyazı</h1>
+<p>YouTube’da altyazıyı açın ve dilini Türkçe seçin.</p>
+<form id="settings">
+<label class="check"><input id="enabled" type="checkbox"> Osmanlıca altyazıyı göster</label>
+<label for="server">Çeviri servisi</label>
+<input id="server" type="url" required placeholder="https://osmanlica-ceviri.abapnews.tr">
+<label for="fontSize">Yazı boyutu <output id="sizeValue">38</output> px</label>
+<input id="fontSize" type="range" min="22" max="72" step="2">
+<label class="check"><input id="bilingual" type="checkbox"> Türkçe altyazı da görünsün</label>
+<button type="submit">Kaydet ve uygula</button>
+<button id="health" type="button" class="secondary">Servis bağlantısını kontrol et</button>
+</form>
+<p id="status" role="status" aria-live="polite"></p>
+<small>Font: eKalem Düz. Açıkken altyazı metinleri seçtiğiniz servise gönderilir. Mevcut servis metinleri kullanım loglarına kaydeder.</small>
+<script src="core.js"></script><script src="popup.js"></script>
+</body>
+</html>

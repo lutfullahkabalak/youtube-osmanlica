@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Osmanlıca Altyazı",
+  "version": "0.1.2",
+  "description": "Açık Türkçe YouTube altyazısını eKalem Düz fontuyla Osmanlı harflerine aktarır.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://osmanlica-ceviri.abapnews.tr/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Osmanlıca altyazı"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "core.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/eKalemDuz.ttf"
+      ],
+      "matches": [
+        "https://www.youtube.com/*"
+      ]
+    }
+  ]
+}

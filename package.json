@@ -1,0 +1,8 @@
+{
+  "name": "youtube-osmanlica",
+  "version": "0.1.2",
+  "private": true,
+  "description": "YouTube Türkçe altyazılarını eKalem Düz ile Osmanlı harflerine aktarır",
+  "scripts": {"test": "sh scripts/check.sh", "build": "python3 scripts/build.py"},
+  "engines": {"node": ">=22"}
+}

@@ -1,0 +1,46 @@
+# YouTube Osmanlıca Altyazı · 0.1.2
+
+Masaüstü Chrome / Edge için Manifest V3 eklentisi. YouTube oynatıcısında gösterilen Türkçe altyazıyı mevcut Osmanlıca çeviri motoruna gönderir ve eKalem Düz ile videonun üzerinde gösterir. Türkçe kelimeleri ve eklerini Osmanlı harflerine aktarır.
+
+## Kurulum
+
+1. Repoyu indirin veya Releases bölümünden ZIP paketini alıp çıkarın. Eklenti ve eKalem Düz fontu pakette hazırdır.
+2. Chrome’da `chrome://extensions` (Edge’de `edge://extensions`) açın. **Geliştirici modu**nu etkinleştirin.
+3. **Paketlenmemiş öğe yükle** ile reponun kök klasörünü (`manifest.json` dosyasının bulunduğu klasör) seçin. ZIP kullanıyorsanız önce çıkarın ve içindeki `youtube-osmanlica` klasörünü seçin.
+4. Varsayılan servis `https://osmanlica-ceviri.abapnews.tr`; yerel servis çalıştırmanız gerekmez.
+5. Açık YouTube sekmesini yenileyin. Bir video açın, altyazıyı açın ve altyazı dilini **Türkçe** seçin; otomatik oluşturulan Türkçe altyazılar da kullanılabilir.
+6. Eklenti simgesine tıklayın. **Osmanlıca altyazıyı göster** seçeneğini işaretleyip **Kaydet ve uygula**ya basın.
+
+Eklenti başlangıçta kapalıdır. Yazı boyutu 22–72 px arasında ayarlanır. Türkçe altyazıyı birlikte gösterebilir veya yalnız Osmanlı harfli çıktıyı seçebilirsiniz. Çift dil açıkken Türkçe ve Osmanlı harfli karşılığı tek kutuda, birlikte gösterilir. Çeviri beklenirken Türkçe satırın tek başına görünüp kaybolması önlenir; satır bittiğinde veya değiştiğinde iki yazı birlikte temizlenir. Servis hatasında YouTube’un Türkçe altyazısı geri gelir. Tam ekran ve sinema modunda aynı oynatıcı katmanı kullanılır. Altyazı kutusu alt kenara yakındır: alt boşluk video yüksekliğinin %4’ü, en az 12 ve en fazla 32 pikseldir.
+
+## Servis ve veri
+
+Varsayılan API: `https://osmanlica-ceviri.abapnews.tr/api/translate`. Sağlık kontrolü: `/api/health`. Çeviri motoru eklentinin içinde değildir; varsayılan olarak canlı sunucuyu kullanır. İsterseniz kendi HTTPS sunucunuzu veya yerelde `http://127.0.0.1:8765` adresini seçebilirsiniz. Farklı servis için ana adresi girip kaydedin, ardından **Servis bağlantısını kontrol et** düğmesine basın. Varsayılan sunucu erişim izni pakette tanımlıdır. Başka bir HTTPS adresine ilk kayıtta yalnız o sunucu için erişim izni istenir. Yerel HTTP yalnız `localhost` ve `127.0.0.1` ile kullanılabilir. Bağlantı kontrolü kaydedilmiş adresi kullanır. Güncellemede önceden kaydedilmiş servis adresi korunur; canlı API’ye geçmek için adresi değiştirip kaydedin.
+
+Eklenti açıkken yalnız oynatıcıda görünen altyazı metni servise gönderilir; ses, video, çerezler ve video adresi gönderilmez. **Mevcut uygulama çeviri girdisini ve çıktısını sunucu kullanım loglarına kaydeder.** Eklenti çeviri önbelleği sekme belleğindedir, en fazla 300 metin tutar ve video/ayar değişiminde temizlenir. Servis cevapları 15 saniye ile sınırlıdır. Hatalarda YouTube’un Türkçe altyazısı geri gelir, bağlantı yeniden denenir.
+
+## Sınırlar
+
+- YouTube’un masaüstü `www.youtube.com` oynatıcısına yöneliktir. Shorts, gömülü oynatıcı, mobil ve resim içinde resim modu bu sürümün kapsamı dışındadır.
+- Türkçe altyazıyı kullanıcının seçmesi gerekir. Otomatik dil seçimi veya sesten altyazı üretimi yapılmaz.
+- YouTube’un sayfa içindeki altyazı yapısına bağlıdır; YouTube değişirse seçiciler güncellenebilir.
+- Çeviri altyazı göründükten sonra başlar, servis hızına göre gecikebilir. Çok hızlı değişen satırlar atlanabilir; eski cevaplar yeni satırın üzerine yazılmaz.
+- Altyazılar cümle ortasında bölünebildiğinden çözümleme bağlamı sınırlıdır. Otomatik altyazı hataları çıktıya yansır. Yalnız eksik çözümleme bilgisi videoda küçük bir notla gösterilir.
+- Paket uygulamadaki eKalem Düz fontunu aynen içerir. Mağaza yayını bu çalışmaya dahil değildir.
+
+## Geliştirme ve doğrulama
+
+```sh
+npm test
+npm run build
+```
+
+`npm run build`, yalnız eklenti dosyalarını ve fontu içeren `dist/youtube-osmanlica/` klasörünü ve `dist/youtube-osmanlica.zip` paketini oluşturur. Node.js 22+ ve Python 3 gerekir; npm bağımlılığı yoktur.
+
+Paket kaynakları değiştiğinde yeniden oluşturun ve uzantılar sayfasında **Yeniden yükle**ye basın; YouTube sekmesini de yenileyin. Servis API’si ve lügat değiştirilmez.
+
+`browser-smoke.js`, derlenmiş eklenti yüklenmiş ayrı bir Chromium profilinde Playwright CLI `run-code` ile çalıştırılabilen tarayıcı kontrolüdür. Gerçek yerel servisi kullanır; YouTube adresine yönlendirilen kontrollü oynatıcı sayfasında fontun gerçekten yüklendiğini, alt kenar konumunu, yavaş servis cevabında iki yazının birlikte görünmesini, altyazı temizlenmesini, boyut/çift dil ayarını, tam ekranı ve kapatmayı doğrular. Gerçek YouTube altyazı akışı için ayrıca Türkçe altyazısı erişilebilir bir videoyla kontrol gerekir.
+
+Çeviri motoru ayrı projededir: [osmanlica-ceviri](https://github.com/lutfullahkabalak/osmanlica-ceviri). Bu repo yalnız tarayıcı eklentisini içerir.
+
+`browser-default-smoke.js`, ayrı test profilinde kayıtlı ayarları temizleyerek yeni kurulumun canlı API varsayılanını, hazır sunucu iznini, popup sağlık kontrolünü ve gerçek çeviri cevabını doğrular. Playwright CLI `run-code` ile çalıştırılır.
