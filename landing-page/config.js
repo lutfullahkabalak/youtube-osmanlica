@@ -1,7 +1,7 @@
 // Add the store URL and actual screenshots here when they are ready.
 window.LANDING_CONFIG = {
   storeUrl: null,
-  releaseUrl: 'https://github.com/lutfullahkabalak/youtube-osmanlica/releases/tag/v0.1.4',
+  releaseUrl: 'https://github.com/lutfullahkabalak/youtube-osmanlica/releases/tag/v0.1.5',
   repositoryUrl: 'https://github.com/lutfullahkabalak/youtube-osmanlica',
   screenshots: [
     {src: null, alt: 'YouTube videosu üzerinde Türkçe ve Osmanlıca altyazılar', title: 'İki yazı, aynı anda', caption: 'Videonun alt kenarında birlikte oku.'},

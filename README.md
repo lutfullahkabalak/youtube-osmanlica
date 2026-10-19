@@ -1,4 +1,4 @@
-# YouTube Osmanlıca Altyazı · 0.1.4
+# YouTube Osmanlıca Altyazı · 0.1.5
 
 Masaüstü Chrome / Edge için Manifest V3 eklentisi. YouTube oynatıcısında gösterilen Türkçe altyazıyı mevcut Osmanlıca çeviri motoruna gönderir ve eKalem Düz ile videonun üzerinde gösterir. Türkçe kelimeleri ve eklerini Osmanlı harflerine aktarır.
 

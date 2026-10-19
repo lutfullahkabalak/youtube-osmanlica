@@ -70,8 +70,8 @@
     shadow = host.attachShadow({mode: 'open'});
     const style = document.createElement('style');
     style.textContent = `:host{color:white} .box{position:absolute;bottom:clamp(12px,4%,32px);left:5%;width:90%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.65}
-      .text{font-family:OttomanEKalem,serif;font-synthesis:none;font-weight:400;white-space:pre-wrap;overflow-wrap:anywhere;background:rgba(0,0,0,.82);box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:3px 12px;border-radius:6px}
-      .text:empty,.latin:empty{display:none}.latin{font-family:system-ui,sans-serif;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;padding:3px 10px;border-radius:5px;background:rgba(0,0,0,.82)}.text{max-width:100%;box-sizing:border-box}.note{font:12px/1.5 system-ui;color:#fff;display:table;margin:5px auto 0;background:rgba(0,0,0,.8);padding:2px 8px;border-radius:4px}.note:empty{display:none}`;
+      .text{font-family:OttomanEKalem,serif;font-synthesis:none;font-weight:400;white-space:pre-wrap;overflow-wrap:anywhere;background:rgba(5,34,38,.92);box-decoration-break:clone;-webkit-box-decoration-break:clone;padding:3px 12px;border-radius:6px}
+      .text:empty,.latin:empty{display:none}.latin{font-family:system-ui,sans-serif;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;padding:3px 10px;border-radius:5px;background:rgba(5,34,38,.92)}.text{max-width:100%;box-sizing:border-box}.note{font:12px/1.5 system-ui;color:#fff;display:table;margin:5px auto 0;background:rgba(5,34,38,.92);padding:2px 8px;border-radius:4px}.note:empty{display:none}`;
     const box = document.createElement('div'); box.className = 'box';
     output = document.createElement('span'); output.className = 'text'; output.lang = 'ota'; output.dir = 'rtl';
     latin = document.createElement('div'); latin.className = 'latin'; latin.lang = 'tr'; latin.dir = 'ltr';
