@@ -49,7 +49,7 @@ Paket kaynakları değiştiğinde yeniden oluşturun ve uzantılar sayfasında *
 
 ## Tanıtım sayfası
 
-Statik tanıtım ve gizlilik sayfaları [landing-page/](landing-page/) klasöründedir. Ekran görüntüleri için üç yer tutucu ayrılmıştır; görseller ve mağaza bağlantısı `landing-page/config.js` dosyasından güncellenir.
+Statik tanıtım ve gizlilik sayfaları [landing-page/](landing-page/) klasöründedir. Gerçek ekran görüntüleri ve mağaza bağlantısı `landing-page/config.js` dosyasından güncellenir.
 
 ## Simge
 

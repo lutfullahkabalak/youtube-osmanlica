@@ -6,7 +6,7 @@ Derleme gerektirmeyen statik sayfa. Yerel önizleme:
 python3 -m http.server 8788 --bind 127.0.0.1 --directory landing-page
 ```
 
-Gerçek ekran görüntüleri geldiğinde `assets/` klasörüne ekleyip `config.js` içindeki üç `screenshots[].src` alanını doldurun. Yer tutucular otomatik olarak gerçek görsellere dönüşür; tıklayınca büyütülür. Mağaza bağlantısı hazır olduğunda aynı dosyadaki `storeUrl` alanını doldurun. Geçerli ekran görüntüsü veya mağaza bağlantısı yokken bunlar varmış gibi gösterilmez.
+Sayfada tek bir gerçek ekran görüntüsü kullanılıyor: `assets/youtube-cift-altyazi.png`. Görüntü tıklayınca büyütülür. Yeni ekran görüntüsü eklenecekse `config.js` içindeki `screenshots` listesine `src` alanı dolu bir öge ekle; `src` alanı boş ögeler gösterilmez. Mağaza bağlantısı hazır olduğunda aynı dosyadaki `storeUrl` alanını doldurun.
 
 Yayın adresi: https://lutfullahkabalak.github.io/youtube-osmanlica/
 
