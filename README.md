@@ -1,4 +1,4 @@
-# YouTube Osmanlıca Altyazı · 0.1.2
+# YouTube Osmanlıca Altyazı · 0.1.3
 
 Masaüstü Chrome / Edge için Manifest V3 eklentisi. YouTube oynatıcısında gösterilen Türkçe altyazıyı mevcut Osmanlıca çeviri motoruna gönderir ve eKalem Düz ile videonun üzerinde gösterir. Türkçe kelimeleri ve eklerini Osmanlı harflerine aktarır.
 
@@ -15,9 +15,9 @@ Eklenti başlangıçta kapalıdır. Yazı boyutu 22–72 px arasında ayarlanır
 
 ## Servis ve veri
 
-Varsayılan API: `https://osmanlica-ceviri.abapnews.tr/api/translate`. Sağlık kontrolü: `/api/health`. Çeviri motoru eklentinin içinde değildir; varsayılan olarak canlı sunucuyu kullanır. İsterseniz kendi HTTPS sunucunuzu veya yerelde `http://127.0.0.1:8765` adresini seçebilirsiniz. Farklı servis için ana adresi girip kaydedin, ardından **Servis bağlantısını kontrol et** düğmesine basın. Varsayılan sunucu erişim izni pakette tanımlıdır. Başka bir HTTPS adresine ilk kayıtta yalnız o sunucu için erişim izni istenir. Yerel HTTP yalnız `localhost` ve `127.0.0.1` ile kullanılabilir. Bağlantı kontrolü kaydedilmiş adresi kullanır. Güncellemede önceden kaydedilmiş servis adresi korunur; canlı API’ye geçmek için adresi değiştirip kaydedin.
+Varsayılan API: `https://osmanlica-ceviri.abapnews.tr/api/subtitles/translate`. Sağlık kontrolü: `/api/health`. Çeviri motoru eklentinin içinde değildir; varsayılan olarak canlı sunucuyu kullanır. İsterseniz kendi HTTPS sunucunuzu veya yerelde `http://127.0.0.1:8765` adresini seçebilirsiniz. Farklı servis için ana adresi girip kaydedin, ardından **Servis bağlantısını kontrol et** düğmesine basın. Varsayılan sunucu erişim izni pakette tanımlıdır. Başka bir HTTPS adresine ilk kayıtta yalnız o sunucu için erişim izni istenir. Yerel HTTP yalnız `localhost` ve `127.0.0.1` ile kullanılabilir. Bağlantı kontrolü kaydedilmiş adresi kullanır. Güncellemede önceden kaydedilmiş servis adresi korunur; canlı API’ye geçmek için adresi değiştirip kaydedin.
 
-Eklenti açıkken yalnız oynatıcıda görünen altyazı metni servise gönderilir; ses, video, çerezler ve video adresi gönderilmez. **Mevcut uygulama çeviri girdisini ve çıktısını sunucu kullanım loglarına kaydeder.** Eklenti çeviri önbelleği sekme belleğindedir, en fazla 300 metin tutar ve video/ayar değişiminde temizlenir. Servis cevapları 15 saniye ile sınırlıdır. Hatalarda YouTube’un Türkçe altyazısı geri gelir, bağlantı yeniden denenir.
+Eklenti açıkken yalnız oynatıcıda görünen altyazı metni servise gönderilir; ses, video, çerezler ve video adresi gönderilmez. **Varsayılan sunucudaki `/api/subtitles/translate` yolu uygulama kullanım loglarını atlar; altyazı girdisi, çıktısı, uyarılar ve istek metadatası bu yolda loglanmaz. Motor hatası ve panic ayrıntıları da bu yolda uygulama loguna yazılmaz. Eklenti, bu yol kullanılamadığında log tutan `/api/translate` yoluna geri dönmez. Kendi sunucunuzu seçerseniz aynı yolu desteklemeli ve loglama politikasını ayrıca doğrulamalısınız.** Eklenti çeviri önbelleği sekme belleğindedir, en fazla 300 metin tutar ve video/ayar değişiminde temizlenir. Servis cevapları 15 saniye ile sınırlıdır. Hatalarda YouTube’un Türkçe altyazısı geri gelir, bağlantı yeniden denenir.
 
 ## Sınırlar
 
@@ -35,7 +35,7 @@ npm test
 npm run build
 ```
 
-`npm run build`, yalnız eklenti dosyalarını ve fontu içeren `dist/youtube-osmanlica/` klasörünü ve `dist/youtube-osmanlica.zip` paketini oluşturur. Node.js 22+ ve Python 3 gerekir; npm bağımlılığı yoktur.
+`npm run build`, yalnız eklenti dosyalarını ve fontu içeren `dist/youtube-osmanlica/` klasörünü ve `dist/youtube-osmanlica.zip` paketini oluşturur. Chrome Web Mağazası için ayrıca `manifest.json` dosyası kökte olan `dist/youtube-osmanlica-webstore.zip` üretilir. Node.js 22+ ve Python 3 gerekir; npm bağımlılığı yoktur.
 
 Paket kaynakları değiştiğinde yeniden oluşturun ve uzantılar sayfasında **Yeniden yükle**ye basın; YouTube sekmesini de yenileyin. Servis API’si ve lügat değiştirilmez.
 

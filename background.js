@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener((message, sender, reply) => {
     if (message.type === 'translate' && (typeof message.text !== 'string' || !message.text.trim() || message.text.length > 4000)) {
       throw new Error('Altyazı metni geçersiz veya çok uzun.');
     }
-    const response = await fetch(options.server + (message.type === 'health' ? '/api/health' : '/api/translate'), {
+    const response = await fetch(options.server + (message.type === 'health' ? '/api/health' : '/api/subtitles/translate'), {
       method: message.type === 'health' ? 'GET' : 'POST',
       headers: {'Content-Type': 'application/json'},
       ...(message.type === 'translate' ? {body: JSON.stringify({text: message.text})} : {}),

@@ -24,9 +24,16 @@ def main():
     with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as package:
         for name in FILES:
             package.write(DEST / name, 'youtube-osmanlica/' + name)
+    store_archive = ROOT / 'dist/youtube-osmanlica-webstore.zip'
+    with zipfile.ZipFile(store_archive, 'w', zipfile.ZIP_DEFLATED) as package:
+        for name in FILES:
+            package.write(DEST / name, name)
+    with zipfile.ZipFile(store_archive) as package:
+        assert 'manifest.json' in package.namelist()
     print(f"Sürüm: {manifest['version']}")
     print(f'Yüklenebilir klasör: {DEST}')
     print(f'ZIP: {archive}')
+    print(f'Mağaza ZIP: {store_archive}')
 
 
 if __name__ == '__main__':

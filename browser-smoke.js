@@ -15,7 +15,7 @@ async (page) => {
       <button onclick="document.getElementById('movie_player').requestFullscreen()">Tam ekran</button></div></body></html>`
   }));
   // A deliberately slow real-service request reproduces the old Latin-first flash.
-  await page.context().route('http://127.0.0.1:8765/api/translate', async route => {
+  await page.context().route('http://127.0.0.1:8765/api/subtitles/translate', async route => {
     await new Promise(resolve => setTimeout(resolve, 500));
     await route.continue();
   });
