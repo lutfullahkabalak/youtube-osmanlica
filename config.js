@@ -4,7 +4,7 @@ window.LANDING_CONFIG = {
   releaseUrl: 'https://github.com/lutfullahkabalak/youtube-osmanlica/releases/tag/v0.1.7',
   repositoryUrl: 'https://github.com/lutfullahkabalak/youtube-osmanlica',
   screenshots: [
-    {src: null, alt: 'YouTube videosu üzerinde Türkçe ve Osmanlıca altyazılar', title: 'İki yazı, aynı anda', caption: 'Videonun alt kenarında birlikte oku.'},
+    {src: './assets/youtube-cift-altyazi.png', alt: 'Vefa Sultan videosunda Türkçe ve Osmanlı harfli altyazıların birlikte gösterimi', title: 'İki yazı, aynı anda', caption: 'Videonun alt kenarında birlikte oku.'},
     {src: null, alt: 'Tam ekranda Osmanlıca altyazı görünümü', title: 'Tam ekranda da yanında', caption: 'Videoya odaklan, altyazıyı takip et.'},
     {src: null, alt: 'Eklentinin yazı boyutu ve çift dil ayarları', title: 'Okumayı kendine uyarla', caption: 'Yazı boyutunu ve çift dil seçimini ayarla.'}
   ]
