@@ -1,4 +1,4 @@
-# YouTube Osmanlıca Altyazı · 0.1.3
+# YouTube Osmanlıca Altyazı · 0.1.4
 
 Masaüstü Chrome / Edge için Manifest V3 eklentisi. YouTube oynatıcısında gösterilen Türkçe altyazıyı mevcut Osmanlıca çeviri motoruna gönderir ve eKalem Düz ile videonun üzerinde gösterir. Türkçe kelimeleri ve eklerini Osmanlı harflerine aktarır.
 
@@ -48,3 +48,7 @@ Paket kaynakları değiştiğinde yeniden oluşturun ve uzantılar sayfasında *
 ## Tanıtım sayfası
 
 Statik tanıtım ve gizlilik sayfaları [landing-page/](landing-page/) klasöründedir. Ekran görüntüleri için üç yer tutucu ayrılmıştır; görseller ve mağaza bağlantısı `landing-page/config.js` dosyasından güncellenir.
+
+## Simge
+
+`icons/` klasöründe kırmızı (`#FF0000`) zemin ve siyah Osmanlıca ye (`ی`, U+06CC) harfinden oluşan SVG ile 16/32/48/128/512 px PNG dosyaları bulunur. Harf eKalem Düz fontundan üretilmiştir. Yeniden üretme isteğe bağlıdır: `python3 scripts/create_icon.py` (fonttools ve Pillow gerekir). Normal test/paketleme bu bağımlılıkları gerektirmez.

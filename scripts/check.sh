@@ -11,6 +11,8 @@ from pathlib import Path
 m = json.loads(Path('manifest.json').read_text())
 assert m['manifest_version'] == 3
 files = [m['background']['service_worker'], m['action']['default_popup']]
+files.extend(m.get('icons', {}).values())
+files.extend(m['action'].get('default_icon', {}).values())
 for entry in m['content_scripts']:
     files.extend(entry['js'])
 for entry in m['web_accessible_resources']:
