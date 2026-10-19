@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Osmanlıca Altyazı",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Açık Türkçe YouTube altyazısını eKalem Düz fontuyla Osmanlı harflerine aktarır.",
   "permissions": [
     "storage"

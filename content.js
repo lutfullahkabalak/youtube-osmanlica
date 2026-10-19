@@ -3,6 +3,8 @@
   const core = OttomanCaptions;
   let options = {...core.defaults};
   let player, host, shadow, output, latin, note, nativeStyle, observer;
+  const captionGapGrace = 180, translationHold = 750;
+  let presentationTimer, transitionStartedAt = null, renderedText = '';
   const hideNative = '.ytp-caption-window-container { visibility: hidden !important; }';
   function readCaption() {
     if (!player || player.querySelector('.ytp-subtitles-button')?.getAttribute('aria-pressed') === 'false' || player.classList.contains('ad-showing')) return '';
@@ -14,16 +16,34 @@
     return options.enabled && player?.isConnected && !document.hidden && !boundVideo?.seeking && !boundVideo?.ended &&
       videoKey === location.pathname + location.search && readCaption() === text;
   }
+  function cancelPresentationExpiry() {
+    clearTimeout(presentationTimer);
+    presentationTimer = null;
+    transitionStartedAt = null;
+  }
   function clearPresentation() {
+    cancelPresentationExpiry();
+    renderedText = '';
     if (output) output.textContent = '';
     if (latin) latin.textContent = '';
     if (note) note.textContent = '';
+  }
+  function retainPresentation(text) {
+    if (!output?.textContent) return;
+    if (text === renderedText) { cancelPresentationExpiry(); return; }
+    // Keep the matched pair through a cue replacement, but never indefinitely.
+    // YouTube can briefly remove its caption nodes while rebuilding a cue.
+    transitionStartedAt ??= Date.now();
+    const remaining = Math.max(0, translationHold - (Date.now() - transitionStartedAt));
+    clearTimeout(presentationTimer);
+    if (!remaining) { clearPresentation(); return; }
+    presentationTimer = setTimeout(clearPresentation, text ? remaining : Math.min(captionGapGrace, remaining));
   }
   function applySize() {
     if (output) output.style.fontSize = `${options.fontSize}px`;
     if (latin) latin.style.fontSize = `${Math.min(26, Math.max(16, Math.round(options.fontSize * 0.5)))}px`;
   }
-  let observed = '', submitted = '', changedAt = 0, retryAt = 0, videoKey = '', boundVideo;
+  let observed = '', submitted = '', retryAt = 0, videoKey = '', boundVideo;
   let status = 'Eklenti kapalı.';
   let fontReady;
   function loadFont() {
@@ -40,12 +60,15 @@
     return response.data;
   }, (result, text) => {
     if (!output) return;
+    cancelPresentationExpiry();
+    renderedText = text;
     output.textContent = result.output;
     latin.textContent = options.bilingual ? text : '';
     note.textContent = result.complete === false ? 'Eksik çözümleme · işaretli kelimeleri kontrol edin' : '';
     status = note.textContent || 'Osmanlıca altyazı gösteriliyor.';
     nativeStyle.textContent = hideNative;
   }, error => {
+    clearPresentation();
     status = `Servise bağlanılamadı: ${error.message} Adresi eklentiden kontrol edin.`;
     note.textContent = 'Çeviri servisine ulaşılamıyor · eklenti ayarlarını kontrol edin';
     nativeStyle.textContent = '';
@@ -90,7 +113,7 @@
     });
     observer.observe(player, {subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['aria-pressed', 'style', 'class', 'hidden']});
   }
-  function invalidate() { clear(); changedAt = Date.now(); }
+  function invalidate() { clear(); }
   function tick() {
     if (!options.enabled) { observer?.disconnect(); host?.remove(); nativeStyle?.remove(); host = null; player = null; return; }
     const next = document.querySelector('#movie_player');
@@ -107,16 +130,17 @@
       video?.addEventListener('emptied', invalidate);
       invalidate();
     }
-    if (video?.seeking || video?.ended || document.hidden) { clear(); return; }
+    if (video?.seeking || video?.ended || document.hidden || player.classList.contains('ad-showing') ||
+      player.querySelector('.ytp-subtitles-button')?.getAttribute('aria-pressed') === 'false') { clear(); return; }
     const text = readCaption();
     if (text !== observed) {
-      observed = text; changedAt = Date.now(); retryAt = 0;
+      observed = text; retryAt = 0;
       queue.show('');
-      clearPresentation(); nativeStyle.textContent = hideNative;
+      retainPresentation(text); nativeStyle.textContent = hideNative;
       submitted = '';
     }
     if (!text) { status = 'YouTube’da altyazıyı açıp Türkçe seçin.'; return; }
-    if ((submitted !== text && Date.now() - changedAt >= 60) || (retryAt && Date.now() >= retryAt)) {
+    if (submitted !== text || (retryAt && Date.now() >= retryAt)) {
       submitted = text; retryAt = 0; status = 'Altyazı Osmanlı harflerine aktarılıyor…';
       void queue.show(text);
     }

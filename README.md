@@ -1,4 +1,4 @@
-# YouTube Osmanlıca Altyazı · 0.1.5
+# YouTube Osmanlıca Altyazı · 0.1.6
 
 Masaüstü Chrome / Edge için Manifest V3 eklentisi. YouTube oynatıcısında gösterilen Türkçe altyazıyı mevcut Osmanlıca çeviri motoruna gönderir ve eKalem Düz ile videonun üzerinde gösterir. Türkçe kelimeleri ve eklerini Osmanlı harflerine aktarır.
 
@@ -13,7 +13,7 @@ Tanıtım sayfası: https://lutfullahkabalak.github.io/youtube-osmanlica/
 5. Açık YouTube sekmesini yenileyin. Bir video açın, altyazıyı açın ve altyazı dilini **Türkçe** seçin; otomatik oluşturulan Türkçe altyazılar da kullanılabilir.
 6. Eklenti simgesine tıklayın. **Osmanlıca altyazıyı göster** seçeneğini işaretleyip **Kaydet ve uygula**ya basın.
 
-Eklenti başlangıçta kapalıdır. Yazı boyutu 22–72 px arasında ayarlanır. Türkçe altyazıyı birlikte gösterebilir veya yalnız Osmanlı harfli çıktıyı seçebilirsiniz. Çift dil açıkken Türkçe ve Osmanlı harfli karşılığı tek kutuda, birlikte gösterilir. Çeviri beklenirken Türkçe satırın tek başına görünüp kaybolması önlenir; satır bittiğinde veya değiştiğinde iki yazı birlikte temizlenir. Servis hatasında YouTube’un Türkçe altyazısı geri gelir. Tam ekran ve sinema modunda aynı oynatıcı katmanı kullanılır. Altyazı kutusu alt kenara yakındır: alt boşluk video yüksekliğinin %4’ü, en az 12 ve en fazla 32 pikseldir.
+Eklenti başlangıçta kapalıdır. Yazı boyutu 22–72 px arasında ayarlanır. Türkçe altyazıyı birlikte gösterebilir veya yalnız Osmanlı harfli çıktıyı seçebilirsiniz. Çift dil açıkken Türkçe ve Osmanlı harfli karşılığı tek kutuda, birlikte gösterilir. Yeni satırın çevirisi beklenirken önceki Türkçe/Osmanlıca çifti en fazla 750 ms korunur; yeni çift hazır olunca birlikte değiştirilir. YouTube’un altyazı düğümlerini kısa süreli yenilemesi için 180 ms boşluk toleransı vardır. Gerçek boşlukta iki yazı birlikte temizlenir; sarma, reklam, altyazıyı kapatma ve video değişiminde beklenmez. Yeni satır isteği ek tarama gecikmesi olmadan başlatılır. Servis hatasında YouTube’un Türkçe altyazısı geri gelir. Tam ekran ve sinema modunda aynı oynatıcı katmanı kullanılır. Altyazı kutusu alt kenara yakındır: alt boşluk video yüksekliğinin %4’ü, en az 12 ve en fazla 32 pikseldir.
 
 ## Servis ve veri
 
@@ -54,3 +54,5 @@ Statik tanıtım ve gizlilik sayfaları [landing-page/](landing-page/) klasörü
 ## Simge
 
 `icons/` klasöründe kırmızı (`#FF0000`) zemin ve siyah Osmanlıca ye (`ی`, U+06CC) harfinden oluşan SVG ile 16/32/48/128/512 px PNG dosyaları bulunur. Harf eKalem Düz fontundan üretilmiştir. Yeniden üretme isteğe bağlıdır: `python3 scripts/create_icon.py` (fonttools ve Pillow gerekir). Normal test/paketleme bu bağımlılıkları gerektirmez.
+
+`browser-transition-smoke.js`, gerçek API cevabı kontrollü geciktirilirken hazır altyazı geçişlerinde önceki çiftin korunduğunu, DOM yenilenmesindeki kısa boşluğun gizlendiğini, iki satırın birlikte değiştiğini ve gerçek boşlukta temizlendiğini boyanan kareleri örnekleyerek denetler.
