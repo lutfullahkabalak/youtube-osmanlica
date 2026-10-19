@@ -52,7 +52,6 @@
     document.querySelector('.steps li:first-child p').textContent = 'Chrome Web Mağazası’ndaki eklenti sayfasını açıp “Chrome’a ekle” düğmesine bas.';
   }
   const gallery = document.getElementById('screenshot-gallery');
-  let actualScreenshots = 0;
   const dialog = document.createElement('dialog');
   dialog.className = 'image-dialog';
   const close = document.createElement('button');
@@ -62,26 +61,15 @@
   close.addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
   for (const shot of config.screenshots) {
+    if (!shot.src) continue;
     const figure = document.createElement('figure'); figure.className = 'screenshot-card';
-    if (shot.src) {
-      actualScreenshots++;
-      const button = document.createElement('button'); button.className = 'screenshot-image-button'; button.type = 'button'; button.setAttribute('aria-label', `${shot.title}: ekran görüntüsünü büyüt`);
-      const img = document.createElement('img'); img.src = shot.src; img.alt = shot.alt; img.loading = 'lazy'; img.decoding = 'async';
-      button.append(img); figure.append(button);
-      button.addEventListener('click', () => {largeImage.src = shot.src; largeImage.alt = shot.alt; dialog.showModal();});
-    } else {
-      const placeholder = document.createElement('div'); placeholder.className = 'screenshot-placeholder'; placeholder.setAttribute('aria-label', `${shot.title}: görsel yakında`);
-      const frame = document.createElement('span'); frame.className = 'placeholder-window'; frame.setAttribute('aria-hidden', 'true');
-      const label = document.createElement('span'); label.textContent = 'Görsel yakında';
-      placeholder.append(frame, label); figure.append(placeholder);
-    }
+    const button = document.createElement('button'); button.className = 'screenshot-image-button'; button.type = 'button'; button.setAttribute('aria-label', `${shot.title}: ekran görüntüsünü büyüt`);
+    const img = document.createElement('img'); img.src = shot.src; img.alt = shot.alt; img.loading = 'lazy'; img.decoding = 'async';
+    button.append(img); figure.append(button);
+    button.addEventListener('click', () => {largeImage.src = shot.src; largeImage.alt = shot.alt; dialog.showModal();});
     const caption = document.createElement('figcaption');
     const title = document.createElement('h3'); title.textContent = shot.title;
     const text = document.createElement('p'); text.textContent = shot.caption;
     caption.append(title, text); figure.append(caption); gallery.append(figure);
-  }
-  if (actualScreenshots === config.screenshots.length) {
-    document.querySelector('.gallery-note').hidden = true;
-    document.querySelector('.demo-hint').textContent = 'Görünümü denemek için düğmeleri kullan.';
   }
 })();
