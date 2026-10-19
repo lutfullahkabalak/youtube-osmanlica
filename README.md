@@ -2,6 +2,8 @@
 
 Masaüstü Chrome / Edge için Manifest V3 eklentisi. YouTube oynatıcısında gösterilen Türkçe altyazıyı mevcut Osmanlıca çeviri motoruna gönderir ve eKalem Düz ile videonun üzerinde gösterir. Türkçe kelimeleri ve eklerini Osmanlı harflerine aktarır.
 
+Tanıtım sayfası: https://lutfullahkabalak.github.io/youtube-osmanlica/
+
 ## Kurulum
 
 1. Repoyu indirin veya Releases bölümünden ZIP paketini alıp çıkarın. Eklenti ve eKalem Düz fontu pakette hazırdır.
