@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Osmanlıca Altyazı",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Açık Türkçe YouTube altyazısını eKalem Düz fontuyla Osmanlı harflerine aktarır.",
   "permissions": [
     "storage"
@@ -31,6 +31,16 @@
         "https://www.youtube.com/*"
       ],
       "js": [
+        "caption-track.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
         "core.js",
         "content.js"
       ],
@@ -52,5 +62,6 @@
     "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "minimum_chrome_version": "111"
 }

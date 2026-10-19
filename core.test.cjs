@@ -71,3 +71,35 @@ test('yeni kurulum canlı API adresini ve ona ait erişim iznini kullanır', () 
   assert.equal(settings().server, 'https://osmanlica-ceviri.abapnews.tr');
   assert.ok(manifest.host_permissions.includes(settings().server + '/*'));
 });
+test('zaman kodlu altyazı ve kelime eklemeleri videoya göre hazırlanır',()=>{
+  const cues=globalThis.OttomanCaptions.timedCaptions({events:[
+    {tStartMs:1000,dDurationMs:2000,segs:[{utf8:'Bir '},{utf8:'kitap',tOffsetMs:500}]},
+    {tStartMs:4000,dDurationMs:1000,segs:[{utf8:'okudum.'}]}
+  ]});
+  assert.ok(cues.some(c=>c.text==='Bir kitap'&&c.start===1&&c.end===3));
+  assert.ok(cues.some(c=>c.text==='Bir'&&c.start===1));
+  assert.deepEqual(globalThis.OttomanCaptions.upcomingTexts(cues,0,new Set()),['Bir kitap','Bir','okudum.']);
+  assert.deepEqual(globalThis.OttomanCaptions.upcomingTexts(cues,3,new Set()),['okudum.']);
+  assert.deepEqual(globalThis.OttomanCaptions.upcomingTexts(cues,0,new Set(['Bir kitap','Bir'])),['okudum.']);
+});
+test('önden hazırlama sınırları, bozuk zaman kodları ve yinelenen metinler',()=>{
+  assert.throws(()=>globalThis.OttomanCaptions.timedCaptions({events:Array(20001).fill({})}));
+  const cues=globalThis.OttomanCaptions.timedCaptions({events:[{tStartMs:-1,dDurationMs:1000,segs:[{utf8:'geçersiz'}]},{tStartMs:1000,dDurationMs:1000,segs:[{utf8:'aynı'}]},{tStartMs:2000,dDurationMs:1000,segs:[{utf8:'aynı'}]},{tStartMs:30000,dDurationMs:1000,segs:[{utf8:'uzak'}]}]});
+  assert.deepEqual(globalThis.OttomanCaptions.upcomingTexts(cues,0,new Set()),['aynı']);
+  assert.deepEqual(globalThis.OttomanCaptions.upcomingTexts(cues,29,new Set()),['uzak']);
+  const many=Array.from({length:50},(_,i)=>({start:i/10,end:10,text:'satır '+i}));
+  assert.equal(globalThis.OttomanCaptions.upcomingTexts(many,0,new Set()).length,8);
+});
+test('toplu hazırlanan sonuç mevcut satırla eşleştiğinde anında kullanılır',async()=>{
+  const rendered=[];const pending=deferred();
+  const queue=new CaptionQueue(()=>pending.promise,(result,text)=>rendered.push([result.output,text]),assert.fail);
+  const work=queue.show('kitap');
+  queue.remember('kitap',{output:'كتاب',complete:true});
+  assert.deepEqual(rendered,[['كتاب','kitap']]);
+  pending.resolve({output:'كتاب',complete:true});await work;
+});
+test('yoğun altyazı penceresi önbelleği döndürüp sonsuz hazırlama başlatmaz',()=>{
+ const cues=Array.from({length:400},(_,i)=>({start:0,end:10,text:'parça '+i}));
+ const cached=new Set(cues.slice(0,300).map(c=>c.text));
+ assert.deepEqual(globalThis.OttomanCaptions.upcomingTexts(cues,0,cached),[]);
+});

@@ -8,6 +8,8 @@ const flush = () => new Promise(setImmediate);
 // Run the real content script against a small caption DOM and a controllable clock.
 async function playerHarness() {
   let now = 1000, nextId = 0, observer;
+  const windowEvents = {};
+  const window = {postMessage(){},addEventListener:(type,fn)=>{windowEvents[type]=fn;}};
   const timers = new Map(), requests = [];
   class Element {
     constructor(name) { this.nodeType = 1; this.name = name; this.textContent = ''; this.isConnected = true; this.style = {}; this.children = []; this.events = {}; }
@@ -30,11 +32,11 @@ async function playerHarness() {
   const document = {hidden:false, fonts:{add(){}}, querySelector:()=>player, createElement:name=>new Element(name)};
   const schedule = (fn, delay, interval=0) => { const id=++nextId; timers.set(id,{fn,at:now+delay,interval}); return id; };
   const context = vm.createContext({
-    URL, document, location:{pathname:'/watch',search:'?v=test'}, Date:{now:()=>now},
+    URL, window, document, location:{pathname:'/watch',search:'?v=test',origin:'https://www.youtube.com'}, Date:{now:()=>now},
     FontFace:class { async load(){return this;} },
     MutationObserver:class {constructor(fn){observer=fn;} observe(){} disconnect(){}},
     setInterval:(fn,ms)=>schedule(fn,ms,ms), setTimeout:(fn,ms)=>schedule(fn,ms), clearTimeout:id=>timers.delete(id),
-    chrome:{runtime:{getURL:s=>s,onMessage:{addListener(){}},sendMessage:({text})=>new Promise((resolve,reject)=>requests.push({text,resolve,reject}))},
+    chrome:{runtime:{getURL:s=>s,onMessage:{addListener(){}},sendMessage:message=>new Promise((resolve,reject)=>requests.push({...message,resolve,reject}))},
       storage:{local:{get:async()=>({enabled:true})},onChanged:{addListener(){}}}}
   });
   for (const name of ['core.js','content.js']) vm.runInContext(fs.readFileSync(path.join(__dirname,name),'utf8'),context,{filename:name});
@@ -56,7 +58,8 @@ async function playerHarness() {
   const mutate = async text => {line.textContent=text; observer([{target:line,addedNodes:[],removedNodes:[]}]); await flush();};
   const reply = async (index,fail=false) => {requests[index].resolve(fail?{ok:false,error:'kapalı'}:{ok:true,data:{output:'OT('+requests[index].text+')',complete:true}});await flush();};
   await reply(0);
-  return {advance,mutate,reply,pair,requests,video,cc,player,document,observer,container,
+  const receiveTrack = async (data,videoId='test') => {windowEvents.message({source:window,origin:'https://www.youtube.com',data:{type:'ottoman-caption-data',videoId,data}});await flush();};
+  return {advance,mutate,reply,pair,requests,video,cc,player,document,observer,container,receiveTrack,location:context.location,
     native:()=>player.children.findLast(n=>n.name==='style'&&n.isConnected).textContent};
 }
 
@@ -103,4 +106,34 @@ test('yeni satır için çeviri isteği sonraki 120ms taramasını beklemez',asy
   const h=await playerHarness();await h.mutate('iki');
   assert.equal(h.requests.length,2);assert.equal(h.requests[1].text,'iki');
   assert.deepEqual(h.pair(),['OT(bir)','bir']);
+});
+
+test('yaklaşan altyazılar toplu hazırlanır, zamanı gelmeden gösterilmez ve ek istek gerektirmez',async()=>{
+ const h=await playerHarness();h.video.currentTime=0;
+ await h.receiveTrack({events:[{tStartMs:2000,dDurationMs:1000,segs:[{utf8:'iki'}]},{tStartMs:4000,dDurationMs:1000,segs:[{utf8:'üç'}]}]});
+ assert.equal(h.requests[1].type,'translateBatch');assert.deepEqual(Array.from(h.requests[1].texts),['iki','üç']);
+ h.requests[1].resolve({ok:true,data:{results:[{output:'OT(iki)',complete:true},{output:'OT(üç)',complete:true}]}});await flush();
+ assert.deepEqual(h.pair(),['OT(bir)','bir']);
+ await h.mutate('iki');assert.deepEqual(h.pair(),['OT(iki)','iki']);assert.equal(h.requests.length,2);
+});
+test('başka videoya ait veya geçersiz zaman kodu toplu çeviri başlatmaz',async()=>{
+ const h=await playerHarness();h.video.currentTime=0;
+ await h.receiveTrack({events:[{tStartMs:1000,dDurationMs:1000,segs:[{utf8:'iki'}]}]},'başka');
+ await h.receiveTrack({events:null});assert.equal(h.requests.length,1);
+});
+test('video değiştikten sonra dönen toplu sonuç yeni videonun önbelleğine girmez',async()=>{
+ const h=await playerHarness();h.video.currentTime=0;
+ await h.receiveTrack({events:[{tStartMs:2000,dDurationMs:1000,segs:[{utf8:'iki'}]}]});
+ h.location.search='?v=new';await h.advance(120);
+ h.requests[1].resolve({ok:true,data:{results:[{output:'ESKİ',complete:true}]}});await flush();
+ await h.reply(2);await h.mutate('iki');
+ assert.equal(h.requests.length,4);assert.equal(h.requests[3].type,'translate');
+ assert.deepEqual(h.pair(),['OT(bir)','bir']);
+});
+test('toplu hazırlama kullanılamıyorsa görünür satır normal yoldan çevrilir',async()=>{
+ const h=await playerHarness();h.video.currentTime=0;
+ await h.receiveTrack({events:[{tStartMs:2000,dDurationMs:1000,segs:[{utf8:'iki'}]}]});
+ h.requests[1].resolve({ok:false,error:'HTTP 400'});await flush();
+ await h.mutate('iki');assert.equal(h.requests[2].type,'translate');
+ await h.reply(2);assert.deepEqual(h.pair(),['OT(iki)','iki']);
 });

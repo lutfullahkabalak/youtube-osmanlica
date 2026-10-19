@@ -5,6 +5,19 @@
   let player, host, shadow, output, latin, note, nativeStyle, observer;
   const captionGapGrace = 180, translationHold = 750;
   let presentationTimer, transitionStartedAt = null, renderedText = '';
+  let timedCues = [], trackData = '', prefetchGeneration = 0, prefetchBusy = false, prefetchRetryAt = 0, bridgeState = '';
+  function currentVideoId() { return new URL('https://www.youtube.com' + location.pathname + location.search).searchParams.get('v') || ''; }
+  function signalTrack(enabled) {
+    const videoId = currentVideoId(), key = videoId + ':' + enabled;
+    if (key === bridgeState) return;
+    bridgeState = key;
+    window.postMessage({type:'ottoman-caption-request',videoId,enabled},location.origin);
+  }
+  function resetPrefetch() {
+    prefetchGeneration++;
+    timedCues = []; trackData = ''; prefetchRetryAt = 0;
+    signalTrack(false);
+  }
   const hideNative = '.ytp-caption-window-container { visibility: hidden !important; }';
   function readCaption() {
     if (!player || player.querySelector('.ytp-subtitles-button')?.getAttribute('aria-pressed') === 'false' || player.classList.contains('ad-showing')) return '';
@@ -74,6 +87,37 @@
     nativeStyle.textContent = '';
     retryAt = Date.now() + 5000;
   }, isFresh);
+  function prefetch() {
+    const cc = player?.querySelector('.ytp-subtitles-button');
+    const active = options.enabled && (cc ? cc.getAttribute('aria-pressed') === 'true' : !!readCaption());
+    signalTrack(active);
+    if (!active || !timedCues.length || prefetchBusy || Date.now() < prefetchRetryAt) return;
+    const cached = new Set(queue.cache.keys());
+    if (submitted) cached.add(submitted); // the visible cue has priority in its own request
+    const texts = core.upcomingTexts(timedCues, boundVideo?.currentTime, cached);
+    if (!texts.length) return;
+    const generation = prefetchGeneration, key = videoKey;
+    prefetchBusy = true;
+    void chrome.runtime.sendMessage({type:'translateBatch',texts}).then(response => {
+      if (!response?.ok || !Array.isArray(response.data?.results) || response.data.results.length !== texts.length) throw new Error('Önden hazırlama kullanılamıyor.');
+      if (!options.enabled || generation !== prefetchGeneration || key !== location.pathname + location.search) return;
+      texts.forEach((text,index) => queue.remember(text,response.data.results[index]));
+    }).catch(() => {
+      if (generation === prefetchGeneration) prefetchRetryAt = Date.now() + 30000;
+    }).finally(() => { prefetchBusy = false; });
+  }
+  window.addEventListener('message',event => {
+    if (event.source !== window || event.origin !== location.origin || event.data?.type !== 'ottoman-caption-data' ||
+      !options.enabled || event.data.videoId !== currentVideoId() || videoKey !== location.pathname + location.search) return;
+    try {
+      const serialized = JSON.stringify(event.data.data);
+      if (serialized.length > 4 * 1024 * 1024 || serialized === trackData) return;
+      const cues = core.timedCaptions(event.data.data);
+      if (!cues.length) return;
+      timedCues = cues; trackData = serialized; prefetchGeneration++; prefetchRetryAt = 0;
+      prefetch();
+    } catch { /* untrusted page metadata never replaces the visible-caption fallback */ }
+  });
   function clear() {
     queue.reset();
     observed = submitted = '';
@@ -120,7 +164,7 @@
     if (!next) { observer?.disconnect(); clear(); host?.remove(); nativeStyle?.remove(); player = null; status = 'Bir YouTube videosu açın.'; return; }
     if (player !== next || !host?.isConnected) mount(next);
     const key = location.pathname + location.search;
-    if (key !== videoKey) { videoKey = key; queue.reset(true); clear(); }
+    if (key !== videoKey) { videoKey = key; resetPrefetch(); queue.reset(true); clear(); }
     const video = player.querySelector('video');
     if (video !== boundVideo) {
       boundVideo?.removeEventListener('seeking', invalidate);
@@ -131,7 +175,7 @@
       invalidate();
     }
     if (video?.seeking || video?.ended || document.hidden || player.classList.contains('ad-showing') ||
-      player.querySelector('.ytp-subtitles-button')?.getAttribute('aria-pressed') === 'false') { clear(); return; }
+      player.querySelector('.ytp-subtitles-button')?.getAttribute('aria-pressed') === 'false') { signalTrack(false); clear(); return; }
     const text = readCaption();
     if (text !== observed) {
       observed = text; retryAt = 0;
@@ -139,23 +183,28 @@
       retainPresentation(text); nativeStyle.textContent = hideNative;
       submitted = '';
     }
-    if (!text) { status = 'YouTube’da altyazıyı açıp Türkçe seçin.'; return; }
+    if (!text) { prefetch(); status = 'YouTube’da altyazıyı açıp Türkçe seçin.'; return; }
     if (submitted !== text || (retryAt && Date.now() >= retryAt)) {
       submitted = text; retryAt = 0; status = 'Altyazı Osmanlı harflerine aktarılıyor…';
       void queue.show(text);
     }
+    prefetch();
   }
   async function load() {
     try { options = core.settings(await chrome.storage.local.get(core.defaults)); }
     catch { options = {...core.defaults}; }
-    clear(); queue.reset(true);
+    clear(); queue.reset(true); resetPrefetch();
     applySize();
     status = options.enabled ? 'YouTube’da altyazıyı açıp Türkçe seçin.' : 'Eklenti kapalı.';
     tick();
   }
   chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local') void load(); });
   chrome.runtime.onMessage.addListener((message, _sender, reply) => {
-    if (message.type === 'status') reply({status, enabled: options.enabled});
+    if (message.type === 'status') {
+      const preparation = prefetchRetryAt > Date.now() ? 'Önden hazırlama şu an kullanılamıyor; görünen satırlar çevriliyor.' :
+        timedCues.length ? 'Zaman kodlu altyazılar önden hazırlanıyor.' : 'Görünen satırlar çevriliyor; önden altyazı verisi bekleniyor.';
+      reply({status: options.enabled ? status + ' ' + preparation : status, enabled: options.enabled});
+    }
   });
   void load();
   setInterval(tick, 120);

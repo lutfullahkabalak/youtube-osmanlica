@@ -7,7 +7,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / 'dist/youtube-osmanlica'
-FILES = ('manifest.json', 'core.js', 'background.js', 'content.js', 'popup.html',
+FILES = ('manifest.json', 'core.js', 'background.js', 'content.js', 'caption-track.js', 'popup.html',
          'popup.css', 'popup.js', 'README.md', 'fonts/eKalemDuz.ttf',
          'icons/icon.svg', *(f'icons/icon{size}.png' for size in (16, 32, 48, 128, 512)))
 
