@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 cd "$(dirname "$0")/.."
-for file in ./*.js; do
+for file in ./*.js ./landing-page/*.js; do
   node --check "$file"
 done
 node --test ./*.test.cjs

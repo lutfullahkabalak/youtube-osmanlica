@@ -44,3 +44,7 @@ Paket kaynakları değiştiğinde yeniden oluşturun ve uzantılar sayfasında *
 Çeviri motoru ayrı projededir: [osmanlica-ceviri](https://github.com/lutfullahkabalak/osmanlica-ceviri). Bu repo yalnız tarayıcı eklentisini içerir.
 
 `browser-default-smoke.js`, ayrı test profilinde kayıtlı ayarları temizleyerek yeni kurulumun canlı API varsayılanını, hazır sunucu iznini, popup sağlık kontrolünü ve gerçek çeviri cevabını doğrular. Playwright CLI `run-code` ile çalıştırılır.
+
+## Tanıtım sayfası
+
+Statik tanıtım ve gizlilik sayfaları [landing-page/](landing-page/) klasöründedir. Ekran görüntüleri için üç yer tutucu ayrılmıştır; görseller ve mağaza bağlantısı `landing-page/config.js` dosyasından güncellenir.
