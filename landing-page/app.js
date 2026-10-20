@@ -39,16 +39,12 @@
   if (config.storeUrl) {
     for (const anchor of document.querySelectorAll('[data-install-cta]')) {
       anchor.href = config.storeUrl;
-      anchor.textContent = "Chrome'a ekle ↗";
+      anchor.textContent = "Chrome’a ekle ↗";
       anchor.target = '_blank';
       anchor.rel = 'noopener noreferrer';
     }
     document.querySelector('[data-store-status]').textContent = 'Chrome Web Mağazası’nda';
     document.querySelector('.install-heading > p:not(.eyebrow)').textContent = 'Eklentiyi Chrome Web Mağazası’ndan ekle, Türkçe altyazıyı aç ve birlikte okumaya başla.';
-    const installLink = document.querySelector('.install-heading [data-release-link]');
-    installLink.href = config.storeUrl;
-    installLink.textContent = "Chrome'a ekle ↗";
-    document.querySelector('.access-note').hidden = true;
     document.querySelector('.steps li:first-child p').textContent = 'Chrome Web Mağazası’ndaki eklenti sayfasını açıp “Chrome’a ekle” düğmesine bas.';
   }
   const gallery = document.getElementById('screenshot-gallery');
